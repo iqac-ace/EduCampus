@@ -1,0 +1,139 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <h2>Student Progress Verification</h2>
+
+    <p class="text-muted">
+        Verify submitted student progress and supporting documents.
+    </p>
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table align-middle">
+
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Parameter</th>
+                            <th>Sub-Parameter</th>
+                            <th>Academic Year</th>
+                            <th>Details</th>
+                            <th>Evidence</th>
+                            <th>Status</th>
+                            <th style="min-width:220px;">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for submission in submissions %}
+                        <tr>
+                            <td>
+                                <strong>{{ submission.student.name }}</strong>
+                                <br>
+                                <small class="text-muted">
+                                    {{ submission.student.register_number }}
+                                </small>
+                            </td>
+
+                            <td>{{ submission.parameter.name }}</td>
+                            <td>{{ submission.subtopic|default:"-" }}</td>
+                            <td>{{ submission.academic_year }}</td>
+
+                            <td>
+                                {% for key, value in submission.details.items %}
+                                    <div>
+                                        <strong>{{ key|title }}:</strong> {{ value }}
+                                    </div>
+                                {% empty %}
+                                    -
+                                {% endfor %}
+                            </td>
+
+                            <td>
+                                {% if submission.evidence %}
+                                    <a
+                                        href="{{ submission.evidence.url }}"
+                                        target="_blank"
+                                        class="btn btn-sm btn-outline-primary"
+                                    >
+                                        View File
+                                    </a>
+                                {% else %}
+                                    No file
+                                {% endif %}
+                            </td>
+
+                            <td>{{ submission.get_status_display }}</td>
+
+                            <td>
+                                {% if submission.status == 'PENDING' %}
+                                    <form
+                                        method="post"
+                                        action="{% url 'verify_progress' submission.id 'approve' %}"
+                                        class="mb-2"
+                                    >
+                                        {% csrf_token %}
+                                        <textarea
+                                            name="verification_remarks"
+                                            class="form-control form-control-sm mb-2"
+                                            placeholder="Verification remarks"
+                                        ></textarea>
+                                        <button class="btn btn-success btn-sm" type="submit">
+                                            Verify & Add Points
+                                        </button>
+                                    </form>
+
+                                    <form
+                                        method="post"
+                                        action="{% url 'verify_progress' submission.id 'reject' %}"
+                                        class="d-inline"
+                                    >
+                                        {% csrf_token %}
+                                        <button class="btn btn-outline-danger btn-sm" type="submit">
+                                            Reject
+                                        </button>
+                                    </form>
+                                {% endif %}
+
+                                {% if portal_role == 'IQAC' or portal_role == 'HOD' %}
+                                    <form
+                                        method="post"
+                                        action="{% url 'delete_progress_submission' submission.id %}"
+                                        class="d-inline"
+                                        onsubmit="return confirm('Delete this submission?');"
+                                    >
+                                        {% csrf_token %}
+                                        <button class="btn btn-sm btn-outline-danger" type="submit">
+                                            Delete
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-4">
+                                No submissions waiting for verification.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

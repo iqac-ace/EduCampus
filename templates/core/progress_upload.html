@@ -1,0 +1,1304 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <!-- =====================================================
+         PAGE HEADING
+    ====================================================== -->
+
+    <div class="mb-4">
+
+        <h2>
+            Add Student Progress
+        </h2>
+
+        <div class="text-muted">
+            Submit one achievement for HOD verification.
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         STUDENT INFORMATION
+    ====================================================== -->
+
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <strong>
+                Student:
+            </strong>
+
+            {{ student.name }}
+
+            <br>
+
+            <strong>
+                Register No:
+            </strong>
+
+            {{ student.register_number }}
+
+            <br>
+
+            <strong>
+                Department:
+            </strong>
+
+            {{ student.department }}
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         FORM
+    ====================================================== -->
+
+    <form
+        method="post"
+        enctype="multipart/form-data"
+        id="progressForm"
+    >
+
+        {% csrf_token %}
+
+
+        <!-- =================================================
+             FORM ERROR
+        ================================================== -->
+
+        {% if form.non_field_errors %}
+
+        <div class="alert alert-danger">
+
+            {% for error in form.non_field_errors %}
+
+                <div>
+                    {{ error }}
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- =================================================
+             PARAMETER + ACADEMIC YEAR
+        ================================================== -->
+
+        <div class="card border-0 shadow-sm mb-4">
+
+            <div class="card-body">
+
+                <div class="row g-3">
+
+
+                    <!-- =====================================
+                         PERFORMANCE PARAMETER
+                    ====================================== -->
+
+                    <div class="col-md-8">
+
+                        <label
+                            for="id_parameter"
+                            class="form-label fw-semibold"
+                        >
+                            Performance Parameter
+                        </label>
+
+
+                        <select
+                            name="parameter"
+                            id="id_parameter"
+                            class="form-select"
+                            required
+                        >
+
+                            <option value="">
+                                -------- Select Parameter --------
+                            </option>
+
+
+                            {% for parameter in parameters %}
+
+                            <option
+                                value="{{ parameter.id }}"
+                                data-code="{{ parameter.code }}"
+                            >
+
+                                {{ parameter.order }}.
+                                {{ parameter.name }}
+                                — Maximum {{ parameter.max_points }} Points
+
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+
+                        {% for error in form.parameter.errors %}
+
+                        <div class="text-danger mt-1">
+                            {{ error }}
+                        </div>
+
+                        {% endfor %}
+
+
+                        <!-- =============================
+                             SUB PARAMETER
+                        ============================== -->
+
+                        <div
+                            id="subtopicSection"
+                            class="mt-4"
+                            style="display:none;"
+                        >
+
+                            <label
+                                for="id_subtopic"
+                                class="form-label fw-semibold"
+                            >
+                                Sub-Parameter / Achievement
+                            </label>
+
+
+                            <select
+                                name="subtopic"
+                                id="id_subtopic"
+                                class="form-select"
+                                required
+                            >
+
+                                <option value="">
+                                    -------- Select Achievement --------
+                                </option>
+
+                            </select>
+
+
+                            {% for error in form.subtopic.errors %}
+
+                            <div class="text-danger mt-1">
+                                {{ error }}
+                            </div>
+
+                            {% endfor %}
+
+                        </div>
+
+
+                        <!-- =============================
+                             REQUIRED DETAILS
+                        ============================== -->
+
+                        <div
+                            id="requirementSection"
+                            class="card mt-4 border-primary"
+                            style="display:none;"
+                        >
+
+                            <div class="card-body">
+
+                                <h5 class="mb-3">
+                                    Required Details
+                                </h5>
+
+
+                                <!-- SCORE INFORMATION -->
+
+                                <div
+                                    id="pointsDisplay"
+                                    class="alert alert-info py-2"
+                                >
+                                </div>
+
+
+                                <!-- REQUIRED INFORMATION LIST -->
+
+                                <div
+                                    id="requirementsList"
+                                    class="mb-3"
+                                >
+                                </div>
+
+
+                                <!-- DYNAMIC INPUT FIELDS -->
+
+                                <div
+                                    id="dynamicFields"
+                                >
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =====================================
+                         ACADEMIC YEAR
+                    ====================================== -->
+
+                    <div class="col-md-4">
+
+                        <label
+                            class="form-label fw-semibold"
+                        >
+                            Academic Year
+                        </label>
+
+                        {{ form.academic_year }}
+
+
+                        {% for error in form.academic_year.errors %}
+
+                        <div class="text-danger mt-1">
+                            {{ error }}
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             SUPPORTING EVIDENCE
+        ================================================== -->
+
+        <div class="card border-0 shadow-sm mb-4">
+
+            <div class="card-body">
+
+                <h5>
+                    Supporting Evidence
+                </h5>
+
+
+                <p class="text-muted">
+
+                    Upload the certificate, mark sheet,
+                    attendance statement or other proof.
+
+                </p>
+
+
+                {{ form.evidence }}
+
+
+                {% for error in form.evidence.errors %}
+
+                <div class="text-danger mt-1">
+
+                    {{ error }}
+
+                </div>
+
+                {% endfor %}
+
+
+
+                <!-- REMARKS -->
+
+                <div class="mt-3">
+
+                    <label class="form-label">
+
+                        Remarks
+
+                    </label>
+
+                    {{ form.remarks }}
+
+
+                    {% for error in form.remarks.errors %}
+
+                    <div class="text-danger mt-1">
+
+                        {{ error }}
+
+                    </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             GENERAL FORM ERRORS
+        ================================================== -->
+
+        {% if form.errors %}
+
+        <div class="alert alert-danger">
+
+            <strong>
+                Please correct the highlighted fields.
+            </strong>
+
+        </div>
+
+        {% endif %}
+
+
+
+        <!-- =================================================
+             SUBMIT
+        ================================================== -->
+
+        <button
+            class="btn btn-primary btn-lg"
+            type="submit"
+        >
+
+            Submit for HOD Verification
+
+        </button>
+
+
+    </form>
+
+</div>
+
+
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================== -->
+
+<script>
+
+
+/* ==========================================================
+   READ RULES FROM DJANGO
+========================================================== */
+
+const RULES = JSON.parse(
+    '{{ rules_json|escapejs }}'
+);
+
+
+
+/* ==========================================================
+   ELEMENTS
+========================================================== */
+
+const parameterSelect =
+    document.getElementById(
+        'id_parameter'
+    );
+
+
+const subtopicSelect =
+    document.getElementById(
+        'id_subtopic'
+    );
+
+
+const subtopicSection =
+    document.getElementById(
+        'subtopicSection'
+    );
+
+
+const requirementSection =
+    document.getElementById(
+        'requirementSection'
+    );
+
+
+const requirementsList =
+    document.getElementById(
+        'requirementsList'
+    );
+
+
+const dynamicFields =
+    document.getElementById(
+        'dynamicFields'
+    );
+
+
+const pointsDisplay =
+    document.getElementById(
+        'pointsDisplay'
+    );
+
+
+
+/* ==========================================================
+   VALUES TO RESTORE AFTER FORM VALIDATION ERROR
+========================================================== */
+
+const previousParameter =
+    '{{ form.data.parameter|default:""|escapejs }}';
+
+
+const previousSubtopic =
+    '{{ form.data.subtopic|default:""|escapejs }}';
+
+
+const previousDetails = [
+
+    '{{ form.data.detail_1|default:""|escapejs }}',
+
+    '{{ form.data.detail_2|default:""|escapejs }}',
+
+    '{{ form.data.detail_3|default:""|escapejs }}',
+
+    '{{ form.data.detail_4|default:""|escapejs }}',
+
+    '{{ form.data.detail_5|default:""|escapejs }}',
+
+    '{{ form.data.detail_6|default:""|escapejs }}',
+
+    '{{ form.data.detail_7|default:""|escapejs }}',
+
+    '{{ form.data.detail_8|default:""|escapejs }}'
+
+];
+
+
+
+let selectedParameterCode = '';
+
+
+
+/* ==========================================================
+   RESET REQUIRED DETAILS
+========================================================== */
+
+function clearRequirementSection() {
+
+    requirementsList.innerHTML = '';
+
+    dynamicFields.innerHTML = '';
+
+    pointsDisplay.innerHTML = '';
+
+    requirementSection.style.display =
+        'none';
+}
+
+
+
+/* ==========================================================
+   GET SELECTED PARAMETER CODE
+========================================================== */
+
+function getSelectedParameterCode() {
+
+    const selectedOption =
+
+        parameterSelect.options[
+            parameterSelect.selectedIndex
+        ];
+
+
+    if (!selectedOption) {
+
+        return '';
+
+    }
+
+
+    return (
+        selectedOption.dataset.code
+        ||
+        ''
+    );
+}
+
+
+
+/* ==========================================================
+   LOAD SUB-PARAMETERS
+========================================================== */
+
+function loadSubParameters(
+    restoreSubtopic = ''
+) {
+
+    clearRequirementSection();
+
+
+    subtopicSelect.innerHTML =
+
+        '<option value="">' +
+        '-------- Select Achievement --------' +
+        '</option>';
+
+
+    selectedParameterCode =
+        getSelectedParameterCode();
+
+
+    if (
+        !selectedParameterCode
+        ||
+        !RULES[
+            selectedParameterCode
+        ]
+    ) {
+
+        subtopicSection.style.display =
+            'none';
+
+        return;
+    }
+
+
+    const parameterRule =
+
+        RULES[
+            selectedParameterCode
+        ];
+
+
+    const subtopics =
+        parameterRule.subtopics || {};
+
+
+    Object.entries(
+        subtopics
+    ).forEach(
+
+        ([code, data]) => {
+
+
+            const option =
+                document.createElement(
+                    'option'
+                );
+
+
+            option.value =
+                code;
+
+
+            let scoreText = '';
+
+
+            if (
+                data.points === null
+                ||
+                data.points === undefined
+            ) {
+
+                scoreText =
+                    'Score calculated from entered details';
+
+            }
+
+            else {
+
+                scoreText =
+                    data.points +
+                    ' Points';
+
+            }
+
+
+            option.textContent =
+
+                data.label
+                +
+                ' — '
+                +
+                scoreText;
+
+
+            subtopicSelect.appendChild(
+                option
+            );
+
+        }
+
+    );
+
+
+    subtopicSection.style.display =
+        'block';
+
+
+    if (restoreSubtopic) {
+
+        subtopicSelect.value =
+            restoreSubtopic;
+
+
+        if (
+            subtopicSelect.value ===
+            restoreSubtopic
+        ) {
+
+            loadAchievementDetails(
+                true
+            );
+
+        }
+
+    }
+
+}
+
+
+
+/* ==========================================================
+   CREATE FIELD
+========================================================== */
+
+function createDetailField(
+    requirement,
+    index,
+    restoredValue = ''
+) {
+
+    const wrapper =
+        document.createElement(
+            'div'
+        );
+
+
+    wrapper.className =
+        'mb-3';
+
+
+    const label =
+        document.createElement(
+            'label'
+        );
+
+
+    label.className =
+        'form-label fw-semibold';
+
+
+    label.setAttribute(
+        'for',
+        'id_detail_' + index
+    );
+
+
+    label.textContent =
+        requirement;
+
+
+    wrapper.appendChild(
+        label
+    );
+
+
+
+    /* ======================================================
+       CGPA / SGPA BASIS
+    ====================================================== */
+
+    if (
+        requirement
+            .toLowerCase()
+            .includes(
+                'basis'
+            )
+    ) {
+
+        const select =
+            document.createElement(
+                'select'
+            );
+
+
+        select.name =
+            'detail_' + index;
+
+
+        select.id =
+            'id_detail_' + index;
+
+
+        select.className =
+            'form-select';
+
+
+        select.required =
+            true;
+
+
+        const blankOption =
+            document.createElement(
+                'option'
+            );
+
+
+        blankOption.value =
+            '';
+
+
+        blankOption.textContent =
+            '-------- Select --------';
+
+
+        select.appendChild(
+            blankOption
+        );
+
+
+        const cgpaOption =
+            document.createElement(
+                'option'
+            );
+
+
+        cgpaOption.value =
+            'CGPA';
+
+
+        cgpaOption.textContent =
+            'CGPA';
+
+
+        select.appendChild(
+            cgpaOption
+        );
+
+
+        const sgpaOption =
+            document.createElement(
+                'option'
+            );
+
+
+        sgpaOption.value =
+            'SGPA';
+
+
+        sgpaOption.textContent =
+            'SGPA';
+
+
+        select.appendChild(
+            sgpaOption
+        );
+
+
+        if (restoredValue) {
+
+            select.value =
+                restoredValue;
+
+        }
+
+
+        wrapper.appendChild(
+            select
+        );
+
+
+        return wrapper;
+    }
+
+
+
+    /* ======================================================
+       NORMAL INPUT
+    ====================================================== */
+
+    const input =
+        document.createElement(
+            'input'
+        );
+
+
+    input.name =
+        'detail_' + index;
+
+
+    input.id =
+        'id_detail_' + index;
+
+
+    input.className =
+        'form-control';
+
+
+    input.required =
+        true;
+
+
+    input.value =
+        restoredValue || '';
+
+
+
+    const requirementText =
+        requirement.toLowerCase();
+
+
+
+    /* ======================================================
+       PERCENTAGE FIELD
+    ====================================================== */
+
+    if (
+        requirementText.includes(
+            'percentage'
+        )
+    ) {
+
+        input.type =
+            'number';
+
+
+        input.step =
+            '0.01';
+
+
+        input.min =
+            '0';
+
+
+        input.max =
+            '100';
+
+    }
+
+
+
+    /* ======================================================
+       CGPA / SGPA VALUE
+    ====================================================== */
+
+    else if (
+
+        requirementText.includes(
+            'cgpa'
+        )
+
+        ||
+
+        requirementText.includes(
+            'sgpa'
+        )
+
+    ) {
+
+        input.type =
+            'number';
+
+
+        input.step =
+            '0.01';
+
+
+        input.min =
+            '0';
+
+
+        input.max =
+            '10';
+
+    }
+
+
+
+    /* ======================================================
+       NUMBER / COUNT
+    ====================================================== */
+
+    else if (
+
+        requirementText.includes(
+            'number of activities'
+        )
+
+        ||
+
+        requirementText.includes(
+            'activity count'
+        )
+
+    ) {
+
+        input.type =
+            'number';
+
+
+        input.step =
+            '1';
+
+
+        input.min =
+            '0';
+
+    }
+
+
+
+    /* ======================================================
+       DATE
+    ====================================================== */
+
+    else if (
+
+        requirementText ===
+        'date'
+
+        ||
+
+        requirementText.endsWith(
+            ' date'
+        )
+
+    ) {
+
+        input.type =
+            'date';
+
+    }
+
+
+
+    /* ======================================================
+       DEFAULT TEXT
+    ====================================================== */
+
+    else {
+
+        input.type =
+            'text';
+
+    }
+
+
+    wrapper.appendChild(
+        input
+    );
+
+
+    return wrapper;
+}
+
+
+
+/* ==========================================================
+   LOAD ACHIEVEMENT DETAILS
+========================================================== */
+
+function loadAchievementDetails(
+    restoreValues = false
+) {
+
+    clearRequirementSection();
+
+
+    const subtopicCode =
+        subtopicSelect.value;
+
+
+    if (
+        !selectedParameterCode
+        ||
+        !subtopicCode
+    ) {
+
+        return;
+    }
+
+
+    const parameterRule =
+
+        RULES[
+            selectedParameterCode
+        ];
+
+
+    if (!parameterRule) {
+
+        return;
+    }
+
+
+    const subRule =
+
+        parameterRule.subtopics[
+            subtopicCode
+        ];
+
+
+    if (!subRule) {
+
+        return;
+    }
+
+
+
+    /* ======================================================
+       SCORE DISPLAY
+    ====================================================== */
+
+    let achievementScoreText = '';
+
+
+    if (
+        subRule.points === null
+        ||
+        subRule.points === undefined
+    ) {
+
+        achievementScoreText =
+
+            'Score will be calculated automatically ' +
+            'from the entered academic details.';
+
+    }
+
+    else {
+
+        achievementScoreText =
+
+            'Score for this Achievement: ' +
+            '<strong>' +
+            subRule.points +
+            ' Points</strong>';
+
+    }
+
+
+    pointsDisplay.innerHTML =
+
+        '<strong>Maximum Parameter Weight:</strong> '
+        +
+        parameterRule.max_points
+        +
+        ' Points'
+        +
+        '<br>'
+        +
+        achievementScoreText;
+
+
+
+    /* ======================================================
+       REQUIREMENTS
+    ====================================================== */
+
+    const requirements =
+        subRule.requirements || [];
+
+
+    if (
+        requirements.length > 0
+    ) {
+
+        const heading =
+            document.createElement(
+                'strong'
+            );
+
+
+        heading.textContent =
+            'Information Required:';
+
+
+        requirementsList.appendChild(
+            heading
+        );
+
+
+        const list =
+            document.createElement(
+                'ul'
+            );
+
+
+        list.className =
+            'mb-0 mt-2';
+
+
+        requirements.forEach(
+
+            function (
+                requirement
+            ) {
+
+                const item =
+                    document.createElement(
+                        'li'
+                    );
+
+
+                item.textContent =
+                    requirement;
+
+
+                list.appendChild(
+                    item
+                );
+
+            }
+
+        );
+
+
+        requirementsList.appendChild(
+            list
+        );
+
+    }
+
+    else {
+
+        requirementsList.innerHTML =
+
+            '<span class="text-muted">' +
+            'No additional information required.' +
+            '</span>';
+
+    }
+
+
+
+    /* ======================================================
+       CREATE REQUIRED INPUTS
+    ====================================================== */
+
+    requirements.forEach(
+
+        function (
+            requirement,
+            index
+        ) {
+
+
+            const restoredValue =
+
+                restoreValues
+                ?
+                (
+                    previousDetails[
+                        index
+                    ]
+                    ||
+                    ''
+                )
+                :
+                '';
+
+
+            const field =
+                createDetailField(
+
+                    requirement,
+
+                    index + 1,
+
+                    restoredValue
+
+                );
+
+
+            dynamicFields.appendChild(
+                field
+            );
+
+        }
+
+    );
+
+
+    requirementSection.style.display =
+        'block';
+}
+
+
+
+/* ==========================================================
+   PARAMETER CHANGE
+========================================================== */
+
+parameterSelect.addEventListener(
+
+    'change',
+
+    function () {
+
+        loadSubParameters();
+
+    }
+
+);
+
+
+
+/* ==========================================================
+   SUB-PARAMETER CHANGE
+========================================================== */
+
+subtopicSelect.addEventListener(
+
+    'change',
+
+    function () {
+
+        loadAchievementDetails();
+
+    }
+
+);
+
+
+
+/* ==========================================================
+   RESTORE VALUES AFTER DJANGO VALIDATION ERROR
+========================================================== */
+
+document.addEventListener(
+
+    'DOMContentLoaded',
+
+    function () {
+
+
+        if (previousParameter) {
+
+            parameterSelect.value =
+                previousParameter;
+
+
+            loadSubParameters(
+                previousSubtopic
+            );
+
+        }
+
+    }
+
+);
+
+
+</script>
+
+
+{% endblock %}
