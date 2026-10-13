@@ -59,7 +59,7 @@
                             <td>
                                 {% if submission.evidence %}
                                     <a
-                                        href="{{ submission.evidence.url }}"
+                                        href="{% url 'view_evidence' submission.id %}"
                                         target="_blank"
                                         class="btn btn-sm btn-outline-primary"
                                     >

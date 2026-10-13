@@ -4,7 +4,7 @@ import os
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden, FileResponse, Http404 
 from django.shortcuts import render,redirect,get_object_or_404
 from django.db.models import Avg,Count,Q
 from django.db import transaction
@@ -393,6 +393,44 @@ def dashboard(request):
                 current_role
         }
     ) 
+
+@login_required
+def view_evidence(request, submission_id):
+
+    submission = get_object_or_404(
+        ProgressSubmission,
+        id=submission_id
+    )
+
+    if not submission.evidence:
+
+        raise Http404(
+            "Evidence file not available."
+        )
+
+    try:
+
+        file_path = submission.evidence.path
+
+    except Exception:
+
+        raise Http404(
+            "Evidence file path is invalid."
+        )
+
+
+    if not os.path.exists(file_path):
+
+        raise Http404(
+            "Evidence file is missing from the server."
+        )
+
+
+    return FileResponse(
+        open(file_path, "rb"),
+        as_attachment=False,
+        filename=os.path.basename(file_path)
+    )
 @login_required
 def download_score_report(request):
 

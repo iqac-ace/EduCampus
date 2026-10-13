@@ -21,6 +21,7 @@ urlpatterns=[
     path('reports/dashboard/download/',views.download_dashboard_report,name='download_dashboard_report'),
     path('approve/<str:model>/<int:pk>/<str:decision>/',views.approve,name='approve'),
     path('reports/',views.reports,name='reports'),
+    path('progress/<int:submission_id>/evidence/',views.view_evidence,name='view_evidence'),
     path('reports/scorecard/',views.download_score_report,name='download_score_report'),
     path('progress/add/',views.student_progress_upload,name='student_progress_add'),
     path('progress/approvals/',views.progress_verification,name='progress_approvals'),
